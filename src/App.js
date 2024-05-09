@@ -13,27 +13,37 @@ class App extends Component {
 
   handleAddTodo = () => {
     const { inputValue, editIndex, todos } = this.state;
-    if (inputValue.trim() !== "") {
-      if (editIndex !== null) {
-        const updatedTodos = [...todos];
-        updatedTodos[editIndex] = inputValue;
-        this.setState({
-          todos: updatedTodos,
-          editIndex: null,
-          inputValue: "",
-        });
-      } else {
-        this.setState({
-          todos: [...todos, inputValue],
-          inputValue: "",
-        });
-      }
+    if (inputValue.trim() === "") {
+      return;
+    }
+
+    if (editIndex !== null) {
+      const updatedTodos = todos.map((todo, index) => {
+        if (index === editIndex) {
+          return inputValue;
+        }
+        return todo;
+      });
+
+      this.setState({
+        todos: updatedTodos,
+        editIndex: null,
+        inputValue: "",
+      });
+    } else {
+      this.setState({
+        todos: [...todos, inputValue],
+        inputValue: "",
+      });
     }
   };
 
   handleDeleteTodo = (index) => {
-    const newTodos = this.state.todos.filter((_, i) => i !== index);
-    this.setState({ todos: newTodos });
+    const updatedTodos = [
+      ...this.state.todos.slice(0, index),
+      ...this.state.todos.slice(index + 1),
+    ];
+    this.setState({ todos: updatedTodos });
   };
 
   handleEditTodo = (index) => {
@@ -51,7 +61,9 @@ class App extends Component {
         <input
           type="text"
           value={inputValue}
-          onChange={(e) => this.setState({ inputValue: e.target.value })}
+          onChange={(event) =>
+            this.setState({ inputValue: event.target.value })
+          }
           placeholder="Add a task"
         />
         <button onClick={this.handleAddTodo}>
